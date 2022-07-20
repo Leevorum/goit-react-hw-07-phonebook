@@ -11,6 +11,7 @@ const store = configureStore({
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(contactsApi.middleware),
+  devTools: process.env.NODE_ENV === 'development',
 });
 
 export { store };
