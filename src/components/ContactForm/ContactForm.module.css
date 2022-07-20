@@ -5,13 +5,22 @@
 
 .formItem {
   display: flex;
-  width: 250px;
+  width: 365px;
   flex-direction: column;
   margin-bottom: 15px;
 }
 .input {
   margin-top: 10px;
+  padding-left: 10px;
+  border-radius: 5px;
+  height: 30px;
+}
+.input::placeholder {
+  color: rgb(121, 121, 122);
 }
 .btn {
   width: 120px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgb(149, 229, 146);
 }

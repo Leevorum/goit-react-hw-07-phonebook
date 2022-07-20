@@ -1,47 +1,66 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { add, remove } from 'redux/phoneBookSlice';
-import { nanoid } from 'nanoid';
+import { useSelector } from 'react-redux';
 import ContactForm from 'components/ContactForm/ContactForm';
 import Filter from 'components/Filter/Filter';
 import ContactList from 'components/ContactList/ContactList';
 import Section from 'components/Section/Section';
-import { getItems } from 'redux/phoneBookSelectors';
+import {
+  useGetAllContactsQuery,
+  useAddContactMutation,
+} from '../../redux/contacts-api';
+import { getFilter } from 'redux/phoneBookSelectors';
+import { useMemo } from 'react';
+
+import toast, { Toaster } from 'react-hot-toast';
 
 export function App() {
-  const contacts = useSelector(getItems);
-  const dispatch = useDispatch();
+  const filteredState = useSelector(getFilter);
+
+  const { data } = useGetAllContactsQuery();
+  const [addContact] = useAddContactMutation();
+
+  //Filter contacts + useMemo
+  const filteredContacts = useMemo(() => {
+    const contacts = data;
+    const filter = filteredState;
+
+    const toLowerCaseFilter = filter.toLowerCase();
+    return contacts?.filter(contact => {
+      return contact.name.toLowerCase().includes(toLowerCaseFilter);
+    });
+  }, [filteredState, data]);
 
   //Add contacts
-  const handleAddContact = data => {
-    const existContact = contacts.filter(contact => {
-      return contact.name.toLowerCase().includes(data.name.toLowerCase());
+  const handleAddContact = formData => {
+    const existContact = data.filter(contact => {
+      return contact.name.toLowerCase().includes(formData.name.toLowerCase());
     });
     // If the name is in the contact list, throw a notification and cancel the code execution
     if (existContact.length > 0) {
-      alert(`${data.name}, is already in your contacts`);
+      const existNotification = () => {
+        toast.error(`${formData.name}, is already in your contacts`, {
+          position: 'top-left',
+        });
+      };
+      existNotification();
       return;
     }
-    //Add an ID to a contact
-    const id = nanoid();
-
-    dispatch(add({ name: data.name, id: id, number: data.number }));
-  };
-
-  // //Delete a contact with ID
-  const deleteContact = contactId => {
-    //Return a new state without contact
-    dispatch(remove(contactId));
+    addContact({ name: formData.name, phone: formData.number });
+    const successNotification = () =>
+      toast.success(`Succes! ${formData.name} was added`, {
+        position: 'top-left',
+      });
+    successNotification();
   };
 
   return (
     <div>
-      <Section title="Phonebook" border="1px solid">
+      <Section title="Phonebook">
         <ContactForm onSubmit={handleAddContact} />
       </Section>
-
+      <Toaster />
       <Section title="Contacts">
         <Filter />
-        <ContactList onDelete={deleteContact} />
+        {data && <ContactList data={filteredContacts} />}
       </Section>
     </div>
   );
