@@ -34,24 +34,28 @@ export function App() {
   //Add contacts
   const handleAddContact = formData => {
     // If the name is in the contact list, throw a notification and cancel the code execution
-    checkContact(formData.name).then(response => {
-      if (response.data.length > 0) {
+    const checkedContactFetch = async contact => {
+      const checkedContact = await checkContact(contact.name);
+      console.log(checkedContact);
+      if (checkedContact.data.length > 0) {
         const existNotification = () => {
-          toast.error(`${formData.name}, is already in your contacts`, {
+          toast.error(`${contact.name}, is already in your contacts`, {
             position: 'top-left',
           });
         };
         existNotification();
         return;
       } else {
-        addContact({ name: formData.name, phone: formData.number });
+        addContact({ name: contact.name, phone: contact.number });
         const successNotification = () =>
-          toast.success(`Succes! ${formData.name} was added`, {
+          toast.success(`Succes! ${contact.name} was added`, {
             position: 'top-left',
           });
         successNotification();
       }
-    });
+    };
+
+    checkedContactFetch(formData);
   };
 
   return (
