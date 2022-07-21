@@ -11,6 +11,14 @@ export const contactsApi = createApi({
       query: () => `/contacts`,
       providesTags: ['Contacts'],
     }),
+    checkContact: builder.mutation({
+      query: name => ({
+        url: `/contacts?search=${name}`,
+        method: 'GET',
+      }),
+      // transformResponse: response => response.data,
+      invalidatesTags: ['Contacts'],
+    }),
     addContact: builder.mutation({
       query: ({ name, phone }) => ({
         url: `/contacts`,
@@ -33,4 +41,5 @@ export const {
   useGetAllContactsQuery,
   useDeleteContactMutation,
   useAddContactMutation,
+  useCheckContactMutation,
 } = contactsApi;

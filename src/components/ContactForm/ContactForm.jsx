@@ -3,31 +3,20 @@ import PropTypes from 'prop-types';
 import s from './ContactForm.module.css';
 
 export default function ContactForm({ onSubmit }) {
-  const [state, setState] = useState({
-    name: '',
-    number: '',
-  });
+  const [stateName, setStateName] = useState('');
+  const [stateNumber, setStateNumber] = useState('');
 
   const handleChange = evt => {
-    // switch (evt.currentTarget.name) {
-    //   case 'name':
-    //     setState({ ...state, name: evt.target.value });
-    //     break;
-    //   case 'number':
-    //     setState({ ...state, number: evt.target.value });
-    //     break;
-    //   default:
-    //     return;
-    // }
     evt.currentTarget.name === 'name'
-      ? setState({ ...state, name: evt.target.value })
-      : setState({ ...state, number: evt.target.value });
+      ? setStateName(evt.target.value)
+      : setStateNumber(evt.target.value);
   };
 
   const handleAddContact = evt => {
     evt.preventDefault();
-    onSubmit(state);
-    setState({ name: '', number: '' });
+    onSubmit({ name: stateName, number: stateNumber });
+    setStateName('');
+    setStateNumber('');
   };
 
   return (
@@ -38,7 +27,7 @@ export default function ContactForm({ onSubmit }) {
           className={s.input}
           type="text"
           name="name"
-          value={state.name}
+          value={stateName}
           onChange={handleChange}
           placeholder="Boris Jonhson"
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
@@ -53,7 +42,7 @@ export default function ContactForm({ onSubmit }) {
           className={s.input}
           type="tel"
           name="number"
-          value={state.number}
+          value={stateNumber}
           onChange={handleChange}
           placeholder="+1 234 567 89"
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"

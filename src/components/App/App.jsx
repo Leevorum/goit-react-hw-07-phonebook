@@ -6,6 +6,7 @@ import Section from 'components/Section/Section';
 import {
   useGetAllContactsQuery,
   useAddContactMutation,
+  useCheckContactMutation,
 } from '../../redux/contacts-api';
 import { getFilter } from 'redux/phoneBookSelectors';
 import { useMemo } from 'react';
@@ -17,6 +18,7 @@ export function App() {
 
   const { data } = useGetAllContactsQuery();
   const [addContact] = useAddContactMutation();
+  const [checkContact] = useCheckContactMutation();
 
   //Filter contacts + useMemo
   const filteredContacts = useMemo(() => {
@@ -31,25 +33,25 @@ export function App() {
 
   //Add contacts
   const handleAddContact = formData => {
-    const existContact = data.filter(contact => {
-      return contact.name.toLowerCase().includes(formData.name.toLowerCase());
-    });
     // If the name is in the contact list, throw a notification and cancel the code execution
-    if (existContact.length > 0) {
-      const existNotification = () => {
-        toast.error(`${formData.name}, is already in your contacts`, {
-          position: 'top-left',
-        });
-      };
-      existNotification();
-      return;
-    }
-    addContact({ name: formData.name, phone: formData.number });
-    const successNotification = () =>
-      toast.success(`Succes! ${formData.name} was added`, {
-        position: 'top-left',
-      });
-    successNotification();
+    checkContact(formData.name).then(response => {
+      if (response.data.length > 0) {
+        const existNotification = () => {
+          toast.error(`${formData.name}, is already in your contacts`, {
+            position: 'top-left',
+          });
+        };
+        existNotification();
+        return;
+      } else {
+        addContact({ name: formData.name, phone: formData.number });
+        const successNotification = () =>
+          toast.success(`Succes! ${formData.name} was added`, {
+            position: 'top-left',
+          });
+        successNotification();
+      }
+    });
   };
 
   return (
